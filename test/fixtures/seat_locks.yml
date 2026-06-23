@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  show: one
+  seat: one
+  expires_at: 2026-06-23 11:44:18
+  status: 1
+
+two:
+  user: two
+  show: two
+  seat: two
+  expires_at: 2026-06-23 11:44:18
+  status: 1
