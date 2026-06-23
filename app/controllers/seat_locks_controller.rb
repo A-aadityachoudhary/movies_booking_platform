@@ -1,0 +1,2 @@
+class SeatLocksController < ApplicationController
+end

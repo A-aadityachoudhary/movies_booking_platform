@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -11,4 +12,14 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  resources :movies, only: [:index, :show]
+  resources :seat_locks, only: [:create, :destroy]
+  resources :bookings, only: [:index, :show, :create]
+  resources :shows, only: [:index, :create, :update, :destroy]
+  namespace :admin do
+    resources :movies, only: [:create, :show, :destroy]
+  end
+  resources :theaters do
+    resources :screens, only: [:create, :show, :destroy]
+  end
 end
