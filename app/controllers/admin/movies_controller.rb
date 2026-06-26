@@ -7,8 +7,11 @@ class Admin::MoviesController < ApplicationController
     def show
         
     end
+    def edit
+        
+    end
     def create
-        @movie = @movies.new(movie_params)
+        @movie = Movies.new(movie_params)
         if @movie.save
             redirect_to admin_movie_path(@movie), notice: "new movie created"
         else

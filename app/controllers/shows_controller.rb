@@ -2,16 +2,17 @@ class ShowsController < ApplicationController
     before_action :authenticate_user!
     load_and_authorize_resource
     def index
-        @shows = Show.include(:movie, :screen)
+        @shows = Show.includes(:movie, screen: :theater)
     end
     def show
     end
     def create
-        show = Show.new(show_params)
-        if show.save
+        @show = Show.new(show_params)
+        if @show.save
             redirect_to shows_path, notice: "successfully created!"
         else
             render :new, status: :unprocessable_entity
+        end
     end
     def update
         if @show.update(show_params)

@@ -6,6 +6,6 @@ class MoviesController < ApplicationController
 
     def show
         @movie = Movie.find(params[:id])
-        @show = @movie.shows.where('start_time > ?', Time.current).includes(screen: :theater).order(:start_time)
+        @shows = @movie.shows.where('start_time > ?', Time.current).includes(screen: :theater).order(:start_time)
     end
 end

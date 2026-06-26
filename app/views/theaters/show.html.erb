@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= @theater.name %> Console</title>
+</head>
+<body>
+    <p><%= link_to "← Back to Dashboards", theaters_path %></p>
+    
+    <h1>Management Console: <%= @theater.name %></h1>
+    <p>Location: <%= @theater.address %>, <%= @theater.city %></p>
+    <hr>
+
+    <h2>1. Configured Auditoriums / Screens</h2>
+    <% if @theater.screens.any? %>
+        <ul>
+            <% @theater.screens.each do |screen| %>
+                <li>
+                    <strong><%= screen.name %></strong> — <%= screen.total_seats %> Total Seats Max capacity (<%= screen.screen_type == 1 ? "IMAX Premium" : "Standard Seating Layout" %>)
+                    <%= link_to "[Remove Screen]", theater_screen_path(@theater, screen), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, style: "color:red; font-size: 12px; margin-left: 10px;" %>
+                </li>
+            <% end %>
+        </ul>
+    <% else %>
+        <p>No projection screens set up inside this facility building yet.</p>
+    <% end %>
+
+    <%= form_with model: [ @theater, Screen.new ], local: true do |f| %>
+        <fieldset style="display: inline-block; background: #fafafa;">
+            <legend>Add New Screen Auditorium</legend>
+            <%= f.label :name, "Screen Name/No:" %>
+            <%= f.text_field :name, placeholder: "e.g., Screen 3 Max", required: true %>
+
+            <%= f.label :total_seats, "Total Seats:" %>
+            <%= f.number_field :total_seats, min: 1, required: true %>
+
+            <%= f.label :screen_type, "Type Layout:" %>
+            <%= f.select :screen_type, [["Standard", 0], ["IMAX Premium", 1]] %>
+
+            <%= f.hidden_field :status, value: 1 %>
+            <%= f.submit "+ Provision Screen", style: "cursor: pointer;" %>
+        </fieldset>
+    <% end %>
+
+    <br><br><hr>
+
+    <h2>2. Schedule a Movie Showtime Slot</h2>
+    <p>Assign an active movie catalog piece onto a physical screen schedule track:</p>
+    
+    <%= form_with model: Show.new, url: shows_path, local: true do |f| %>
+        <table cellpadding="6">
+            <tr>
+                <td><%= f.label :movie_id, "Select Film Asset:" %></td>
+                <td><%= f.collection_select :movie_id, Movie.all, :id, :title, prompt: "Choose Movie" %></td>
+            </tr>
+            <tr>
+                <td><%= f.label :screen_id, "Target Screening Hall:" %></td>
+                <td><%= f.collection_select :screen_id, @theater.screens, :id, :name, prompt: "Select Auditorium Room" %></td>
+            </tr>
+            <tr>
+                <td><%= f.label :start_time, "Display Opening Time:" %></td>
+                <td><%= f.datetime_field :start_time, required: true %></td>
+            </tr>
+            <tr>
+                <td><%= f.label :end_time, "Clean-Up / Ending Time:" %></td>
+                <td><%= f.datetime_field :end_time, required: true %></td>
+            </tr>
+            <tr>
+                <td><%= f.label :ticket_price, "Individual Seat Base Admission Price ($):" %></td>
+                <td><%= f.number_field :ticket_price, step: :any, required: true %></td>
+            </tr>
+            <%= f.hidden_field :status, value: 1 %>
+            <tr>
+                <td colspan="2">
+                    <%= f.submit "Broadcast Movie Showtime Schedule", style: "padding: 8px 16px; background: #007bff; color: white; border:none; cursor:pointer;" %>
+                </td>
+            </tr>
+        </table>
+    <% end %>
+</body>
+</html>

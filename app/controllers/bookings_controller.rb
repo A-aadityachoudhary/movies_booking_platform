@@ -6,7 +6,7 @@ class BookingsController < ApplicationController
     def show
         @booking = current_user.bookings.find(params[:id])
     end
-    def creat
+    def create
         @booking = current_user.bookings.new(booking_params)
         @booking.booked_at = Time.current
         if @booking.save
@@ -17,6 +17,6 @@ class BookingsController < ApplicationController
     end
     private
     def booking_params
-        params.require(:booking).permit(:show_id, :total_tickets, :total_amount, :payment_status, :booking_status, :booking_refernce)
+        params.require(:booking).permit(:show_id, :total_tickets, :total_amount, :payment_status, :booking_status, :booking_reference)
     end
 end

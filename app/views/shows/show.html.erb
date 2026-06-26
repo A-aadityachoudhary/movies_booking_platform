@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Seats</title>
+</head>
+<body>
+    <main>
+        <h1>Select Your Seats</h1>
+        <p><strong>Screen:</strong> <%= @show.screen.name %> | <strong>Price:</strong> $<%= @show.ticket_price %></p>
+        
+        <div style="text-align: center; margin: 20px 0; background: #ccc; padding: 5px;">
+            <strong>SCREEN THIS WAY</strong>
+        </div>
+
+        <h3>Seating Layout</h3>
+        <div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; margin-bottom: 30px;">
+            <% @show.screen.seats.order(:row_name, :seat_number).each do |seat| %>
+                <% is_locked = @show.seat_locks.active.exists?(seat_id: seat.id) %>
+                <% is_booked = @show.booking_seats.exists?(seat_id: seat.id) %>
+
+                <fieldset style="text-align: center; padding: 5px; <%= 'background: #ffcccc;' if is_booked || is_locked %>">
+                    <small><%= seat.row_name %><%= seat.seat_number %></small><br>
+                    
+                    <% if is_booked %>
+                        <span style="color: red; font-size: 11px;">Booked</span>
+                    <% elsif is_locked %>
+                        <span style="color: orange; font-size: 11px;">Locked</span>
+                    <% else %>
+                        <%= form_with model: SeatLock.new, url: seat_locks_path, local: true do |f| %>
+                            <%= f.hidden_field :show_id, value: @show.id %>
+                            <%= f.hidden_field :seat_id, value: seat.id %>
+                            <%= f.submit "Hold", style: "font-size: 10px; cursor: pointer;" %>
+                        <% end %>
+                    <% end %>
+                </fieldset>
+            <% end %>
+        </div>
+
+        <hr>
+
+        <h3>Confirm Booking</h3>
+        <p>Once you hold your seat selections, confirm your total ticket count to finalize payment processing:</p>
+        
+        <%= form_with model: Booking.new, url: bookings_path, local: true do |f| %>
+            <%= f.hidden_field :show_id, value: @show.id %>
+            
+            <p>
+                <%= f.label :total_tickets, "Number of Seats Selected:" %><br>
+                <%= f.number_field :total_tickets, min: 1, required: true %>
+            </p>
+            
+            <%= f.submit "Purchase Tickets Now", style: "padding: 10px 20px; background: #28a745; color: white; border: none; font-size: 16px; cursor: pointer;" %>
+        <% end %>
+    </main>
+</body>
+</html>
