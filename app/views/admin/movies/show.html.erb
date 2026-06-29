@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Insights — <%= @movie.title %></title>
+</head>
+<body>
+    <main style="padding: 10px 0;">
+        <p><%= link_to "← Back to Master Catalog Inventory", admin_movies_path %></p>
+
+        <fieldset style="background: #f8f9fa; padding: 20px; margin-bottom: 30px;">
+            <legend><h1>System Asset Metadata: <%= @movie.title %></h1></legend>
+            <table cellpadding="6" cellspacing="0" border="0">
+                <tr>
+                    <td><strong>Database Identifier ID:</strong></td>
+                    <td><code><%= @movie.id %></code></td>
+                </tr>
+                <tr>
+                    <td><strong>Genre Tagging:</strong></td>
+                    <td><%= @movie.genre %></td>
+                </tr>
+                <tr>
+                    <td><strong>Audio Stream Language:</strong></td>
+                    <td><%= @movie.language %></td>
+                </tr>
+                <tr>
+                    <td><strong>Calculated Runtime Duration:</strong></td>
+                    <td><%= @movie.duration %> Minutes</td>
+                </tr>
+                <tr>
+                    <td><strong>Global Release Date:</strong></td>
+                    <td><%= @movie.release_date.strftime("%B %d, %Y") %></td>
+                </tr>
+                <tr>
+                    <td><strong>Global Status Setting:</strong></td>
+                    <td><strong style="text-transform: uppercase;"><%= @movie.status %></strong></td>
+                </tr>
+                <tr>
+                    <td valign="top"><strong>Production Synopsis:</strong></td>
+                    <td><%= @movie.description %></td>
+                </tr>
+            </table>
+        </fieldset>
+
+        <h2>Active Show Trackings / Operational Metrics</h2>
+        <p>The following shows are scheduled across theater ecosystems using this movie asset profile:</p>
+
+        <% if @movie.shows.any? %>
+            <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+                <thead style="background: #e9ecef;">
+                    <tr>
+                        <th>Show ID</th>
+                        <th>Theater Name</th>
+                        <th>Assigned Screen</th>
+                        <th>Showtime Execution Grid</th>
+                        <th>Configured Base Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @movie.shows.includes(screen: :theater).each do |show| %>
+                        <tr>
+                            <td>#<%= show.id %></td>
+                            <td><strong><%= show.screen.theater.name %></strong> (<%= show.screen.theater.city %>)</td>
+                            <td><%= show.screen.name %></td>
+                            <td><%= show.start_time.strftime("%B %d, %Y at %I:%M %p") %></td>
+                            <td>$<%= number_with_precision(show.ticket_price, precision: 2) %></td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        <% else %>
+            <p style="color: #666; font-style: italic;">No independent theater venues have registered show profiles using this movie asset model track yet.</p>
+        <% end %>
+        
+        <br><br>
+        <hr>
+        <%= link_to "Delete Movie Permanently From Platform", admin_movie_path(@movie), data: { turbo_method: :delete, turbo_confirm: "Are you completely certain?" }, style: "color: white; background: red; padding: 8px 16px; text-decoration: none; display: inline-block; font-weight: bold;" %>
+    </main>
+</body>
+</html>

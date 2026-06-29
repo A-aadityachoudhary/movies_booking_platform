@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Global Core Admin Dashboard - Master Vault</title>
+</head>
+<body>
+    <main style="padding: 10px 0;">
+        <h1>Global Movies Distribution Catalog</h1>
+        <p>As a global administrator, you manage the raw movie master list available for individual theaters to schedule.</p>
+
+        <% if @movies.any? %>
+            <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: #343a40; color: white;">
+                    <tr>
+                        <th>ID</th>
+                        <th>Movie Title</th>
+                        <th>Genre</th>
+                        <th>Language Track</th>
+                        <th>Release Date</th>
+                        <th>Status Flag</th>
+                        <th>Management Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @movies.each do |movie| %>
+                        <tr>
+                            <td><%= movie.id %></td>
+                            <td><strong><%= movie.title %></strong></td>
+                            <td><%= movie.genre %></td>
+                            <td><%= movie.language %></td>
+                            <td><%= movie.release_date %></td>
+                            <td>
+                                <span style="padding: 2px 5px; border-radius: 3px; font-size: 12px;
+                                    <%= case movie.status
+                                        when 'active' then 'background: #d4edda; color: #155724;'
+                                        when 'upcoming' then 'background: #fff3cd; color: #856404;'
+                                        else 'background: #e2e3e5; color: #383d41;'
+                                        end %>">
+                                    <%= movie.status.to_s.upcase %>
+                                </span>
+                            </td>
+                            <td>
+                                <%= link_to "View System Insights", admin_movie_path(movie) %> | 
+                                <%= link_to "Delete Entry", admin_movie_path(movie), data: { turbo_method: :delete, turbo_confirm: "Permanently wipe this movie and all its associated shows from the entire platform ecosystem?" }, style: "color: red;" %>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        <% else %>
+            <p>No film entities are present inside the database system catalog track.</p>
+        <% end %>
+
+        <br><br><hr><br>
+
+        <fieldset style="background-color: #fffdf5; border: 2px solid #ffc107; padding: 20px;">
+            <legend><h2>🎬 Ingest a New Film Track Into Global Master Database</h2></legend>
+            <%= form_with model: [:admin, Movie.new], local: true do |f| %>
+                <table cellpadding="6" cellspacing="0">
+                    <tr>
+                        <td><%= f.label :title, "Official Release Title:" %></td>
+                        <td><%= f.text_field :title, required: true, style: "width: 300px;" %></td>
+                    </tr>
+                    <tr>
+                        <td><%= f.label :genre, "Genre Tag Classification:" %></td>
+                        <td><%= f.text_field :genre, placeholder: "e.g., Sci-Fi, Action, Romance", required: true %></td>
+                    </tr>
+                    <tr>
+                        <td><%= f.label :language, "Audio Delivery Track:" %></td>
+                        <td><%= f.text_field :language, placeholder: "e.g., English, Japanese", required: true %></td>
+                    </tr>
+                    <tr>
+                        <td><%= f.label :duration, "Run Duration (In Minutes):" %></td>
+                        <td><%= f.number_field :duration, min: 1, required: true %></td>
+                    </tr>
+                    <tr>
+                        <td><%= f.label :release_date, "Global Theatrical Release Date:" %></td>
+                        <td><%= f.date_field :release_date, required: true %></td>
+                    </tr>
+                    <tr>
+                        <td><%= f.label :status, "Ecosystem Visibility Flag:" %></td>
+                        <td><%= f.select :status, [["Upcoming Blockbuster", :upcoming], ["Active (Browsable by Owners)", :active], ["Inactive Archive", :inactive]] %></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><= f.label :description, "Full Production Logline / Summary:" %></td>
+                        <td><%= f.text_area :description, rows: 4, cols: 50, required: true %></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <%= f.submit "Publish & Lock into Global Catalog", style: "padding: 10px 20px; background: #ffc107; color: black; border: 1px solid #333; font-weight: bold; cursor: pointer;" %>
+                        </td>
+                    </tr>
+                </table>
+            <% end %>
+        </fieldset>
+    </main>
+</body>
+</html>

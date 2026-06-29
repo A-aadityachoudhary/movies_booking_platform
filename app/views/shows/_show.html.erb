@@ -1,0 +1,26 @@
+<% is_locked = show.seat_locks.active.exists?(seat_id: seat.id) %>
+<% locked_by_current_user = show.seat_locks.active.exists?(seat_id: seat.id, user_id: current_user&.id) %>
+<% is_booked = show.booking_seats.exists?(seat_id: seat.id) %>
+
+<fieldset id="seat_<%= seat.id %>" 
+          data-row="<%= seat.row_name %>" 
+          data-number="<%= seat.seat_number %>"
+          style="text-align: center; padding: 5px; min-width: 60px; <%= 'background: #ffcccc;' if is_booked || is_locked %>">
+    <small><%= seat.row_name %><%= seat.seat_number %></small><br>
+    
+    <% if is_booked %>
+        <span style="color: red; font-size: 11px; font-weight: bold;">Booked</span>
+    <% elsif is_locked %>
+        <% if locked_by_current_user %>
+            <%= check_box_tag "seat_ids[]", seat.id, true, 
+                              id: "check_seat_#{seat.id}", 
+                              onchange: "submitInstantLockForm()" %>
+        <% else %>
+            <span style="color: orange; font-size: 11px;">Locked</span>
+        <% end %>
+    <% else %>
+        <%= check_box_tag "seat_ids[]", seat.id, false, 
+                          id: "check_seat_#{seat.id}", 
+                          onchange: "submitInstantLockForm()" %>
+    <% end %>
+</fieldset>

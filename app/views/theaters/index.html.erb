@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Owner Management Dashboard</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <strong>Owner Studio Panel</strong> | 
+            <%= link_to 'View Booking Reports', '#booking-reports' %> | 
+            <%= link_to 'Logout', destroy_user_session_path, data: { turbo_method: :delete } %>
+        </nav>
+        <hr>
+    </header>
+
+    <main>
+        <h1>Your Managed Theaters</h1>
+        
+        <% if @theaters.any? %>
+            <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+                <thead style="background-color: #f4f4f4;">
+                    <tr>
+                        <th>Theater Name</th>
+                        <th>Location (City, State)</th>
+                        <th>Contact Email</th>
+                        <th>Operational Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @theaters.each do |theater| %>
+                        <tr>
+                            <td><strong><%= theater.name %></strong></td>
+                            <td><%= theater.city %>, <%= theater.state %></td>
+                            <td><%= theater.email %></td>
+                            <td><%= theater.status == 1 ? "Open" : "Suspended" %></td>
+                            <td>
+                                <%= link_to 'Manage Screens & Config', theater_path(theater) %> | 
+                                <%= link_to 'Edit Details', edit_theater_path(theater) %>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        <% else %>
+            <p>You haven't added any theaters to your profile yet.</p>
+        <% end %>
+
+        <br><hr><br>
+
+        <fieldset>
+            <legend><h2>Register a New Theater Location</h2></legend>
+            <%= form_with model: Theater.new, local: true do |f| %>
+                <p>
+                    <%= f.label :name, "Theater Name:" %><br>
+                    <%= f.text_field :name, required: true, style: "width: 100%; max-width: 400px;" %>
+                </p>
+                <p>
+                    <%= f.label :description, "Description Summary:" %><br>
+                    <%= f.text_area :description, rows: 3, style: "width: 100%; max-width: 400px;" %>
+                </p>
+                <p>
+                    <%= f.label :address, "Street Address:" %><br>
+                    <%= f.text_field :address, required: true %>
+                </p>
+                <p>
+                    <%= f.label :city, "City:" %> 
+                    <%= f.text_field :city, required: true %>
+                    
+                    <%= f.label :state, "State:" %> 
+                    <%= f.text_field :state, required: true %>
+                </p>
+                <p>
+                    <%= f.label :contact_number, "Contact Phone Number:" %><br>
+                    <%= f.text_field :contact_number, required: true %>
+                </p>
+                <p>
+                    <%= f.label :email, "Box Office Management Email:" %><br>
+                    <%= f.email_field :email, required: true %>
+                </p>
+                <p>
+                    <%= f.label :status, "Initial Status Configuration:" %><br>
+                    <%= f.select :status, [["Active / Operable", 1], ["Inactive / Under Renovation", 0]] %>
+                </p>
+                <%= f.submit "Create Location Profile", style: "padding: 6px 12px; background: #28a745; color: white; border: none; cursor: pointer;" %>
+            <% end %>
+        </fieldset>
+    </main>
+</body>
+</html>
