@@ -4,7 +4,6 @@ class ShowChannel < ApplicationCable::Channel
   end
 
   def unsubscribed
-  
   end
 
   def toggle_seat(data)
@@ -14,9 +13,7 @@ class ShowChannel < ApplicationCable::Channel
     show = Show.find_by(id: show_id)
 
     return unless show && seat_id
-
-    seat = Seat.find_by(id: seat_id)
-    return unless seat
+    return unless current_user
 
     if selected
       SeatLock.transaction do
@@ -52,7 +49,8 @@ class ShowChannel < ApplicationCable::Channel
           action: "seat_updated",
           status: "available",
           showtime_seat_id: seat_id,
-          locked_by_id: nil
+          locked_by_id: nil,
+          locked_at: nil
         })
       end
     end
