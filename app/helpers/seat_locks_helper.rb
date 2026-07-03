@@ -1,0 +1,2 @@
+module SeatLocksHelper
+end

@@ -1,0 +1,88 @@
+<div style="font-family: system-ui, -apple-system, sans-serif; max-width: 56rem; margin: 0 auto; padding: 3rem 1rem; color: #ffffff; background-color: #0f172a; min-height: 100vh;">
+  
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <h1 style="font-size: 2.25rem; font-weight: 900; letter-spacing: -0.05em; margin-bottom: 0.5rem; text-shadow: 0 4px 6px rgba(0,0,0,0.3); color: #ffffff;"><%= @show.movie.title %></h1>
+    <p style="color: rgba(255, 255, 255, 0.8); font-weight: 600; letter-spacing: 0.05em; font-size: 0.875rem; margin: 0;">
+      🎬 Screen Room: <%= @show.screen.name %> — Ticket Price: $<%= @show.ticket_price %>
+    </p>
+  </div>
+
+  <div style="width: 100%; height: 10px; background: linear-gradient(to right, #fed7aa, #ffffff, #fed7aa); border-bottom-left-radius: 9999px; border-bottom-right-radius: 9999px; box-shadow: 0 12px 30px rgba(255, 255, 255, 0.4); margin-bottom: 3.5rem; position: relative;">
+    <span style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3em; color: rgba(255, 255, 255, 0.6); width: max-content;">
+      STAGE / THEATER SCREEN
+    </span>
+  </div>
+
+  <%= form_with url: bookings_path, method: :post, local: true, data: { turbo: false }, id: "booking-reservation-form" do |f| %>
+    <%= f.hidden_field :show_id, value: @show.id %>
+    
+    <div id="seating-chart-deck" 
+         data-showtime-id="<%= @show.id %>" 
+         data-current-user-id="<%= current_user&.id %>" 
+         style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 2rem; border-radius: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); margin-bottom: 2rem;">
+      
+      <div style="display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.75rem; max-width: 42rem; margin: 0 auto; overflow-x: auto; padding: 0.25rem;">
+        
+        <% @show.screen.seats.order(:row_name, :seat_number).each do |seat| %>
+          <% seat_label = "#{seat.row_name}#{seat.seat_number}" %>
+          <% is_locked = @show.seat_locks.active.exists?(seat_id: seat.id) %>
+          <% is_locked_by_me = @show.seat_locks.active.exists?(seat_id: seat.id, user_id: current_user&.id) %>
+          <% is_locked_by_other = is_locked && !is_locked_by_me %>
+          <% is_booked = @show.booking_seats.exists?(seat_id: seat.id) %>
+          <% active_lock_record = @show.seat_locks.active.find_by(seat_id: seat.id) if is_locked %>
+
+          <label style="position: relative; display: block; cursor: pointer;">
+            <input type="checkbox"
+                   name="seat_ids[]"
+                   id="checkbox_<%= seat.id %>"
+                   value="<%= seat.id %>"
+                   <%= "checked" if is_locked_by_me %>
+                   <%= "disabled" if is_locked_by_other || is_booked %>
+                   style="position: absolute; opacity: 0; width: 0; height: 0; margin: 0;">
+
+            <div id="seat_wrapper_<%= seat.id %>"
+                 data-seat-label="<%= seat_label %>"
+                 data-locked-at="<%= active_lock_record.updated_at.iso8601 if active_lock_record %>"
+                 style="width: 40px; height: 40px; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: all 150ms ease-in-out; user-select: none; border: 1px solid;
+              <%= if is_booked
+                    'background: rgba(15, 23, 42, 0.6); border-color: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.2); cursor: not-allowed; text-decoration: line-through;'
+                  elsif is_locked_by_other
+                    'background: rgba(15, 23, 42, 0.6); border-color: rgba(255, 255, 255, 0.05); color: rgba(253, 186, 116, 0.4); cursor: not-allowed;'
+                  elsif is_locked_by_me
+                    'background: #ffffff; color: #0f172a; border-color: #ffffff; transform: scale(0.9);'
+                  else
+                    'background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); color: #ffffff;'
+                  end %>">
+              <%= is_locked_by_other ? "🔒" : seat_label %>
+            </div>
+          </label>
+        <% end %>
+
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-bottom: 2.5rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.8); text-transform: uppercase;">
+      <div style="display: flex; align-items: center; gap: 0.625rem;">
+        <div style="width: 20px; height: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 0.5rem;"></div> 
+        <span>Available</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.625rem;">
+        <div style="width: 20px; height: 20px; background: #ffffff; border: 1px solid #ffffff; border-radius: 0.5rem;"></div> 
+        <span style="color: #ffffff;">Selected</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.625rem;">
+        <div style="width: 20px; height: 20px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 10px; color: rgba(253, 186, 116, 0.4);">🔒</div> 
+        <span style="color: rgba(254, 215, 170, 0.6);">Held (1m Lock)</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.625rem;">
+        <div style="width: 20px; height: 20px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 8px; color: rgba(255, 255, 255, 0.2); text-decoration: line-through;">X</div> 
+        <span style="color: rgba(255, 255, 255, 0.4);">Sold Out</span>
+      </div>
+    </div>
+
+    <div style="text-align: center;">
+      <%= f.submit "Proceed to Reserve Seats", 
+                   style: "background: #ffffff; color: #0f172a; font-weight: 800; font-size: 0.875rem; padding: 1rem 2.5rem; border: none; border-radius: 0.75rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); cursor: pointer; letter-spacing: -0.01em;" %>
+    </div>
+  <% end %>
+</div>

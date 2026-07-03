@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Now Showing - Movie Tickets</title>
+</head>
+<body>
+    
+    <main>
+        <h1>Now Showing</h1>
+        
+        <% if @movies.any? %>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                <% @movies.each do |movie| %>
+                    <fieldset>
+                        <legend><strong><%= movie.title %></strong></legend>
+                        <p><strong>Genre:</strong> <%= movie.genre %> | <strong>Language:</strong> <%= movie.language %></p>
+                        <p><strong>Duration:</strong> <%= movie.duration %> mins</p>
+                        <p><%= truncate(movie.description, length: 100) %></p>
+                        <%= link_to 'Book Tickets', movie_path(movie), style: "display: inline-block; padding: 5px 10px; background: #007BFF; color: white; text-decoration: none; border-radius: 3px;" %>
+                    </fieldset>
+                <% end %>
+            </div>
+        <% else %>
+            <p>No active movies found.</p>
+        <% end %>
+    </main>
+</body>
+</html>

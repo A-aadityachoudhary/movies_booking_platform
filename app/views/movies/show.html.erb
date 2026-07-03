@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= @movie.title %> - Showtimes</title>
+</head>
+<body>
+    <p><%= link_to "← Back to Movies", movies_path %></p>
+    
+    <main>
+        <fieldset>
+            <legend><h1><%= @movie.title %></h1></legend>
+            <p><strong>Genre:</strong> <%= @movie.genre %> | <strong>Language:</strong> <%= @movie.language %> | <strong>Released:</strong> <%= @movie.release_date %></p>
+            <p><strong>Duration:</strong> <%= @movie.duration %> Minutes</p>
+            <p><strong>Synopsis:</strong><br><%= @movie.description %></p>
+        </fieldset>
+
+        <h2>Select a Showtime</h2>
+        <% if @shows.any? %>
+            <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th>Theater & City</th>
+                        <th>Screen</th>
+                        <th>Showtime</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @shows.each do |show| %>
+                        <tr>
+                            <td><strong><%= show.screen.theater.name %></strong> (<%= show.screen.theater.city %>)</td>
+                            <td><%= show.screen.name %> (<%= show.screen.screen_type %>)</td>
+                            <td><%= show.start_time.strftime("%B %d, %Y at %I:%M %p") %></td>
+                            <td>$<%= number_with_precision(show.ticket_price, precision: 2) %></td>
+                            <td>
+                                <%= link_to "Select Seats", show_path(show), style: "padding: 5px 10px; background: green; color: white; text-decoration: none;" %>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        <% else %>
+            <p>No upcoming shows available for this movie.</p>
+        <% end %>
+    </main>
+</body>
+</html>

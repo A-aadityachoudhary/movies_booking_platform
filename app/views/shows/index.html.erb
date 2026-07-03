@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Master Showtimes Schedule</title>
+</head>
+<body>
+    <header>
+        
+        <hr>
+    </header>
+
+    <main>
+        <h1>Master Showtimes Schedule</h1>
+
+        <% if @shows.any? %>
+            <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th>Show ID</th>
+                        <th>Movie Title</th>
+                        <th>Theater Location</th>
+                        <th>Auditorium Screen</th>
+                        <th>Timings (Start - End)</th>
+                        <th>Base Ticket Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @shows.each do |show| %>
+                        <tr>
+                            <td>#<%= show.id %></td>
+                            <td><strong><%= show.movie.title %></strong></td>
+                            <td><%= show.screen.theater.name %> (<%= show.screen.theater.city %>)</td>
+                            <td><%= show.screen.name %> (<%= show.screen.screen_type == 1 ? "IMAX" : "Standard" %>)</td>
+                            <td>
+                                <strong>Starts:</strong> <%= show.start_time.strftime("%B %d, %Y at %I:%M %p") %><br>
+                                <small style="color: #666;"><strong>Ends:</strong> <%= show.end_time.strftime("%I:%M %p") %></small>
+                            </td>
+                            <td>$<%= number_with_precision(show.ticket_price, precision: 2) %></td>
+                            <td>
+                                <span style="padding: 2px 5px; border-radius: 3px; font-size: 12px; background: <%= show.status == 1 ? '#d4edda; color: #155724;' : '#f8d7da; color: #721c24;' %>">
+                                    <%= show.status == 1 ? "ACTIVE" : "INACTIVE" %>
+                                </span>
+                            </td>
+                            <td>
+                                <%= link_to "View Seating Chart", show_path(show) %>
+                                <% if current_user.theater_owner? || current_user.admin? %>
+                                    | <%= link_to "Cancel Show", show_path(show), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to remove this showtime entirely?" }, style: "color: red;" %>
+                                <% end %>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        <% else %>
+            <p>No showtimes are currently scheduled in the system.</p>
+        <% end %>
+    </main>
+</body>
+</html>

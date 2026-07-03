@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Confirmation - <%= @booking.booking_reference %></title>
+</head>
+<body>
+    <main style="max-width: 600px; margin: auto; padding: 20px; border: 2px dashed #000;">
+        <h2 style="text-align: center; color: green;">✔ Booking Confirmed!</h2>
+        <hr>
+        <p><strong>Reference ID:</strong> <%= @booking.booking_reference %></p>
+        <p><strong>Movie:</strong> <%= @booking.show.movie.title %></p>
+        <p><strong>Theater:</strong> <%= @booking.show.screen.theater.name %></p>
+        <p><strong>Date & Time:</strong> <%= @booking.show.start_time.strftime("%B %d, %Y at %I:%M %p") %></p>
+        <p><strong>Seats Booked:</strong> 
+            <% @booking.seats.each do |seat| %>
+                [<%= seat.row_name %><%= seat.seat_number %>]
+            <% end %>
+        </p>
+        <hr>
+        <p><strong>Total Tickets:</strong> <%= @booking.total_tickets %></p>
+        <p><strong>Amount Paid:</strong> $<%= number_with_precision(@booking.total_amount, precision: 2) %></p>
+        <p><strong>Booking Status:</strong> <%= @booking.booking_status.to_s.upcase %></p>
+        <p><strong>Payment Status:</strong> <%= @booking.payment_status.to_s.upcase %></p>
+        <hr>
+        <p style="text-align: center;"><small>Show this barcode/receipt confirmation screen at the counter entry.</small></p>
+    </main>
+    <p style="text-align: center;"><%= link_to "Back to Dashboard", movies_path %></p>
+</body>
+</html>

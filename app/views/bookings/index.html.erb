@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Bookings</title>
+</head>
+<body>
+    
+
+    <main>
+        <h1>Your Booking History</h1>
+
+        <% if @bookings.any? %>
+            <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: #f2f2f2;">
+                        <th>Booking Reference</th>
+                        <th>Movie Title</th>
+                        <th>Theater & Screen</th>
+                        <th>Showtime</th>
+                        <th>Tickets</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @bookings.each do |booking| %>
+                        <tr>
+                            <td><strong><%= booking.booking_reference %></strong></td>
+                            <td><%= booking.show.movie.title %></td>
+                            <td>
+                                <%= booking.show.screen.theater.name %><br>
+                                <small><%= booking.show.screen.name %></small>
+                            </td>
+                            <td><%= booking.show.start_time.strftime("%B %d, %Y at %I:%M %p") %></td>
+                            <td><%= booking.total_tickets %></td>
+                            <td>$<%= number_with_precision(booking.total_amount, precision: 2) %></td>
+                            <td>
+                                <span style="padding: 2px 5px; border-radius: 3px; font-size: 12px; 
+                                    <%= case booking.booking_status
+                                        when 'confirmed' then 'background: #d4edda; color: #155724;'
+                                        when 'pending' then 'background: #fff3cd; color: #856404;'
+                                        else 'background: #f8d7da; color: #721c24;'
+                                        end %>">
+                                    <%= booking.booking_status.to_s.upcase %>
+                                </span>
+                            </td>
+                            <td>
+                                <%= link_to "View Ticket", booking_path(booking) %>
+                            </td>
+                        </tr>
+                    <% end %>
+                </tbody>
+            </table>
+        <% else %>
+            <p>You haven't booked any tickets yet.</p>
+            <%= link_to "Browse Movies & Book Now", root_path, style: "display: inline-block; padding: 8px 15px; background: #007BFF; color: white; text-decoration: none;" %>
+        <% end %>
+    </main>
+</body>
+</html>

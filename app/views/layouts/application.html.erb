@@ -24,6 +24,47 @@
   </head>
 
   <body>
+    <% if user_signed_in? %>
+      <header>
+        <nav style="padding: 10px 0; font-family: sans-serif;">
+          <strong><%= link_to 'MovieBooking', root_path, style: "text-decoration: none; color: black;" %></strong> | 
+
+          <% if current_user.admin? %>
+            <span>⚙️ <strong>Admin Portal:</strong></span>
+            <%= link_to 'Manage Global Movies Catalog', admin_movies_path %> | 
+            <%= link_to 'All System Showtimes', shows_path %> |
+
+          <% elsif current_user.theater_owner? %>
+            <span>🍿 <strong>Owner Studio:</strong></span>
+            <%= link_to 'My Theaters & Screens', theaters_path %> | 
+            <%= link_to 'Master Showtimes Grid', shows_path %> |
+
+          <% elsif current_user.customer? %>
+            <%= link_to 'Now Showing', root_path %> | 
+            <%= link_to 'My Bookings History', bookings_path %> |
+          <% end %>
+
+          <span style="float: right;">
+            Logged in as: <strong><%= current_user.first_name.presence || current_user.email %></strong> 
+            (<%= current_user.role.to_s.humanize %>) | 
+            <%= link_to 'Sign Out', destroy_user_session_path, data: { turbo_method: :delete }, style: "color: red;" %>
+          </span>
+        </nav>
+        <hr style="clear: both; margin-bottom: 20px;">
+      </header>
+    <% end %>
+
+    <% if flash[:notice] %>
+      <div style="background: #d4edda; color: #155724; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+    <% if flash[:alert] %>
+      <div style="background: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
     <%= yield %>
   </body>
 </html>
